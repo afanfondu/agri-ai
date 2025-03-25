@@ -30,7 +30,8 @@ import {
 import { FlaskRoundIcon as Flask } from "lucide-react";
 import { FertilizerFormValues, fertilizerFormSchema } from "./schema";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 
 const soilTypes = ["Sandy", "Loamy", "Black", "Red", "Clayey"];
 const cropTypes = [
@@ -67,14 +68,11 @@ export default function FertilizerRecommendationSection() {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: FertilizerFormValues) => {
       console.log(data);
-      const res = await axios.post(
-        "http://localhost:5000/fertilizer-recommendation",
-        {
-          ...data,
-          crop_type: data.cropType,
-          soil_type: data.soilType,
-        },
-      );
+      const res = await api.post("/fertilizer-recommendation", {
+        ...data,
+        crop_type: data.cropType,
+        soil_type: data.soilType,
+      });
       return res.data;
     },
     onSuccess: (data) => {

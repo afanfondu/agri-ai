@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Leaf } from "lucide-react";
 import { CropFormValues, cropFormSchema } from "./schema";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import api from "@/lib/api";
 
 const defaultValues: CropFormValues = {
   nitrogen: 0,
@@ -42,10 +42,7 @@ export default function CropRecommendationSection() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: CropFormValues) => {
-      const res = await axios.post(
-        "http://localhost:5000/crop-recommendation",
-        data,
-      );
+      const res = await api.post("/crop-recommendation", data);
       return res.data;
     },
     onSuccess: (data) => {

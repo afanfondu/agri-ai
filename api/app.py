@@ -19,9 +19,6 @@ if not os.path.exists(crop_model_path):
 if not os.path.exists(fert_model_path):
     print(f"Error: Fertilizer model file not found at {fert_model_path}")
 
-if not os.path.exists(plant_model_path):
-    print(f"Error: Plant detection model file not found at {plant_model_path}")
-
 # Load the crop recommendation model
 try:
     with open(crop_model_path, "rb") as f:
