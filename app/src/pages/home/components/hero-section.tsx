@@ -9,6 +9,7 @@ import {
 } from "@react-three/drei";
 import { Suspense } from "react";
 import { ChevronDown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function Model() {
   const { scene } = useGLTF("/plant.gltf");
@@ -48,6 +49,7 @@ function HeroContent() {
 }
 
 export default function HeroSection() {
+  const isMobile = useIsMobile();
   return (
     <section className="w-full h-screen relative">
       {/* <Plant /> */}
@@ -66,7 +68,7 @@ export default function HeroSection() {
             </Float>
           </PresentationControls>
           <Environment preset="forest" />
-          <OrbitControls autoRotate enableZoom={false} />
+          <OrbitControls enablePan={!isMobile} autoRotate enableZoom={false} />
         </Suspense>
       </Canvas>
       <HeroContent />
