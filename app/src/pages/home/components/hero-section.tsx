@@ -3,7 +3,6 @@ import {
   Environment,
   Float,
   OrbitControls,
-  PresentationControls,
   Stage,
   useGLTF,
 } from "@react-three/drei";
@@ -22,7 +21,7 @@ export function Plant() {
   return (
     <Canvas shadows dpr={[1, 2]} camera={{ fov: 50 }}>
       <Suspense fallback={null}>
-        <Stage preset="rembrandt" intensity={1} environment="city">
+        <Stage preset="rembrandt" intensity={1} environment="forest">
           <Model />
         </Stage>
       </Suspense>
@@ -53,24 +52,22 @@ export default function HeroSection() {
   return (
     <section className="w-full h-screen relative">
       {/* <Plant /> */}
-      <Canvas className="bg-gradient-to-b from-green-800 to-green-600">
-        <Suspense fallback={null}>
-          <PresentationControls
-            global
-            rotation={[0.13, 0.1, 0]}
-            polar={[-0.4, 0.2]}
-            azimuth={[-1, 0.75]}
-            // config={{ mass: 2, tension: 400 }}
-            // snap={{ mass: 4, tension: 400 }}
-          >
+      {!isMobile && (
+        <Canvas className="bg-gradient-to-b from-green-800 to-green-600">
+          <Suspense fallback={null}>
             <Float rotationIntensity={0.4}>
               <Model />
             </Float>
-          </PresentationControls>
-          <Environment preset="forest" />
-          <OrbitControls enablePan={!isMobile} autoRotate enableZoom={false} />
-        </Suspense>
-      </Canvas>
+            <Environment preset="forest" />
+            <OrbitControls
+              enableRotate={!isMobile}
+              enablePan={false}
+              autoRotate
+              enableZoom={false}
+            />
+          </Suspense>
+        </Canvas>
+      )}
       <HeroContent />
     </section>
   );
