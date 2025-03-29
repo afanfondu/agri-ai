@@ -22,22 +22,43 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <div className="container flex h-16 items-center justify-between px-4">
-        <a className="flex items-center gap-2">
+      <div className="container mx-auto max-w-6xl flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-2">
           <Leaf className="h-6 w-6 text-primary" />
           <span className="font-bold text-xl">Agri AI</span>
-        </a>
+        </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a className="text-sm font-medium hover:text-primary">
+          <div
+            onClick={() => {
+              document
+                .querySelector("#plant-prediction")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="text-sm font-medium hover:text-primary cursor-pointer"
+          >
             Plant Detection
-          </a>
-          <a className="text-sm font-medium hover:text-primary">
+          </div>
+          <div
+            onClick={() => {
+              document
+                .querySelector("#crop-recommendation")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="text-sm font-medium hover:text-primary cursor-pointer"
+          >
             Crop Recommendation
-          </a>
-          <a className="text-sm font-medium hover:text-primary">
+          </div>
+          <div
+            onClick={() => {
+              document
+                .querySelector("#fertilizer-recommendation")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="text-sm font-medium hover:text-primary cursor-pointer"
+          >
             Fertilizer Recommendation
-          </a>
+          </div>
         </nav>
 
         <div className="flex items-center gap-2">

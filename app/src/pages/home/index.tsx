@@ -1,7 +1,7 @@
 import HeroSection from "./components/hero-section";
-import PlantDetectionSection from "./components/plant-detection-section";
 import CropRecommendationSection from "./components/crop-recommendation-section";
 import FertilizerRecommendationSection from "./components/fertilizer-recommendation-section";
+import PlantPredictionSection from "./components/plant-prediction-section";
 
 export default function HomePage() {
   return (
@@ -9,7 +9,7 @@ export default function HomePage() {
       <HeroSection />
 
       <div className="container px-4 py-8 space-y-16 max-w-6xl">
-        <PlantDetectionSection />
+        <PlantPredictionSection />
         <CropRecommendationSection />
         <FertilizerRecommendationSection />
       </div>

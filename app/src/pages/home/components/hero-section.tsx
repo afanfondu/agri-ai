@@ -8,7 +8,6 @@ import {
 } from "@react-three/drei";
 import { Suspense } from "react";
 import { ChevronDown } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 function Model() {
   const { scene } = useGLTF("/plant.gltf");
@@ -40,7 +39,14 @@ function HeroContent() {
         Smart agriculture toolkit for plant detection, crop and fertilizer
         recommendations
       </p>
-      <div className="mt-12 animate-bounce pointer-events-auto">
+      <div
+        onClick={() =>
+          document
+            .querySelector("#plant-prediction")
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+        className="mt-12 animate-bounce pointer-events-auto cursor-pointer"
+      >
         <ChevronDown className="h-8 w-8 text-white" />
       </div>
     </div>
@@ -48,26 +54,18 @@ function HeroContent() {
 }
 
 export default function HeroSection() {
-  const isMobile = useIsMobile();
   return (
     <section className="w-full h-screen relative">
       {/* <Plant /> */}
-      {!isMobile && (
-        <Canvas className="bg-gradient-to-b from-green-800 to-green-600">
-          <Suspense fallback={null}>
-            <Float rotationIntensity={0.4}>
-              <Model />
-            </Float>
-            <Environment preset="forest" />
-            <OrbitControls
-              enableRotate={!isMobile}
-              enablePan={false}
-              autoRotate
-              enableZoom={false}
-            />
-          </Suspense>
-        </Canvas>
-      )}
+      <Canvas className="bg-gradient-to-b from-green-800 to-green-600">
+        <Suspense fallback={null}>
+          <Float rotationIntensity={0.4}>
+            <Model />
+          </Float>
+          <Environment preset="forest" />
+          <OrbitControls enablePan={false} autoRotate enableZoom={false} />
+        </Suspense>
+      </Canvas>
       <HeroContent />
     </section>
   );

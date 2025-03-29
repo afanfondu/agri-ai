@@ -67,7 +67,6 @@ export default function FertilizerRecommendationSection() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: FertilizerFormValues) => {
-      console.log(data);
       const res = await api.post("/fertilizer-recommendation", {
         ...data,
         crop_type: data.cropType,
@@ -76,7 +75,6 @@ export default function FertilizerRecommendationSection() {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log("fertilizer >>", data);
       setResult({
         fertilizer: data.recommendation.fertilizer,
         message: data.recommendation.description,
@@ -89,8 +87,7 @@ export default function FertilizerRecommendationSection() {
           : error instanceof Error
             ? error.message
             : "Something went wrong!";
-      console.log(errMsg);
-      console.error(error.message);
+      console.error(errMsg);
     },
   });
 

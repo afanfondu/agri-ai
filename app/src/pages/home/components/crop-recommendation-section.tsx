@@ -46,7 +46,6 @@ export default function CropRecommendationSection() {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log("crop >>", data);
       setResult({
         crop: data.recommendation.crop,
         message: data.message,
