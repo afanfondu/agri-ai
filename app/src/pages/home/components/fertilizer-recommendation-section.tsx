@@ -30,8 +30,8 @@ import {
 import { FlaskRoundIcon as Flask } from "lucide-react";
 import { FertilizerFormValues, fertilizerFormSchema } from "./schema";
 import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import api from "@/lib/api";
+import { toast } from "sonner";
 
 const soilTypes = ["Sandy", "Loamy", "Black", "Red", "Clayey"];
 const cropTypes = [
@@ -80,14 +80,8 @@ export default function FertilizerRecommendationSection() {
         message: data.recommendation.description,
       });
     },
-    onError: (error) => {
-      const errMsg =
-        error instanceof AxiosError
-          ? error.response?.data
-          : error instanceof Error
-            ? error.message
-            : "Something went wrong!";
-      console.error(errMsg);
+    onError: () => {
+      toast.error("Something went wrong! Please try again later.");
     },
   });
 

@@ -23,6 +23,7 @@ import { Leaf } from "lucide-react";
 import { CropFormValues, cropFormSchema } from "./schema";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { toast } from "sonner";
 
 const defaultValues: CropFormValues = {
   nitrogen: 0,
@@ -50,6 +51,9 @@ export default function CropRecommendationSection() {
         crop: data.recommendation.crop,
         message: data.message,
       });
+    },
+    onError: () => {
+      toast.error("Something went wrong! Please try again later.");
     },
   });
 

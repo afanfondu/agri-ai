@@ -1,7 +1,7 @@
 import type React from "react";
 
-import { useState, useRef } from "react";
-import { Camera, Upload, Info } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { Camera as CameraIcon, Upload, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +14,8 @@ import {
 import api from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import Webcam from "react-webcam";
+import { toast } from "sonner";
 
 type PredictionResult = {
   class_name: string;
@@ -31,8 +33,10 @@ export default function PlantPredictionSection() {
   const [topPredictions, setTopPredictions] = useState<PredictionResult[]>([]);
   const [showAllPredictions, setShowAllPredictions] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const webcamRef = useRef<Webcam>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (imageData: string) => {
@@ -64,6 +68,12 @@ export default function PlantPredictionSection() {
             ? error.message
             : "Something went wrong!";
       console.error("Error detecting plant:", errMsg);
+      toast.error("Error detecting plant", {
+        description:
+          typeof errMsg === "string"
+            ? errMsg
+            : "Please try again with a clearer image",
+      });
     },
   });
 
@@ -79,36 +89,59 @@ export default function PlantPredictionSection() {
     }
   };
 
-  const openCamera = async () => {
+  const openCamera = () => {
     setIsCameraOpen(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+    setCameraError(null);
+    setCameraReady(false);
+  };
+
+  const captureImage = useCallback(() => {
+    if (webcamRef.current && cameraReady) {
+      try {
+        const imageSrc = webcamRef.current.getScreenshot();
+        if (imageSrc) {
+          setImage(imageSrc);
+          detectPlant(imageSrc);
+          setIsCameraOpen(false);
+        } else {
+          throw new Error("Failed to capture image");
+        }
+      } catch (error) {
+        console.error("Error capturing image:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to capture image";
+        setCameraError(errorMessage);
+        toast.error("Camera error", {
+          description:
+            errorMessage || "Failed to capture image. Please try again.",
+        });
       }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
+    } else if (!cameraReady) {
+      toast.error("Camera not ready", {
+        description:
+          "Please wait for the camera to initialize fully before capturing.",
+      });
     }
-  };
+  }, [cameraReady]);
 
-  const captureImage = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement("canvas");
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      canvas
-        .getContext("2d")
-        ?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const imageDataUrl = canvas.toDataURL("image/jpeg");
-      setImage(imageDataUrl);
-      detectPlant(imageDataUrl);
-
-      // Stop camera stream
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream?.getTracks().forEach((track) => track.stop());
-      setIsCameraOpen(false);
+  const handleCameraError = useCallback((error: string | Error) => {
+    let errorMessage = "Unknown camera error";
+    if (typeof error === "string") {
+      errorMessage = error;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
     }
-  };
+    console.error("Camera error:", errorMessage);
+    setCameraError(errorMessage);
+    toast.error("Camera issue", {
+      description: errorMessage,
+    });
+    setCameraReady(false);
+  }, []);
+
+  const handleCameraUserMedia = useCallback(() => {
+    setCameraReady(true);
+  }, []);
 
   const detectPlant = async (imageData: string) => {
     setResult(null);
@@ -126,6 +159,13 @@ export default function PlantPredictionSection() {
 
   const toggleShowAllPredictions = () => {
     setShowAllPredictions(!showAllPredictions);
+  };
+
+  // Video constraints with back camera preference
+  const videoConstraints = {
+    width: 720,
+    height: 720,
+    facingMode: { ideal: "environment" },
   };
 
   return (
@@ -161,7 +201,7 @@ export default function PlantPredictionSection() {
                       Upload Image
                     </Button>
                     <Button onClick={openCamera}>
-                      <Camera className="mr-2 h-4 w-4" />
+                      <CameraIcon className="mr-2 h-4 w-4" />
                       Use Camera
                     </Button>
                     <input
@@ -178,25 +218,40 @@ export default function PlantPredictionSection() {
 
             {isCameraOpen && (
               <div className="w-full">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full rounded-lg"
-                />
+                <div className="w-full relative aspect-square max-w-md mx-auto overflow-hidden rounded-lg">
+                  {cameraError ? (
+                    <div className="flex flex-col items-center justify-center h-full p-4 text-center bg-gray-100">
+                      <p className="text-red-500 mb-2">{cameraError}</p>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsCameraOpen(false)}
+                      >
+                        Go Back
+                      </Button>
+                    </div>
+                  ) : (
+                    <Webcam
+                      ref={webcamRef}
+                      audio={false}
+                      screenshotFormat="image/jpeg"
+                      videoConstraints={videoConstraints}
+                      onUserMediaError={handleCameraError}
+                      onUserMedia={handleCameraUserMedia}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
                 <div className="flex justify-center mt-4">
-                  <Button onClick={captureImage}>Capture</Button>
+                  <Button
+                    onClick={captureImage}
+                    disabled={!!cameraError || !cameraReady}
+                  >
+                    {cameraReady ? "Capture" : "Initializing camera..."}
+                  </Button>
                   <Button
                     variant="outline"
                     className="ml-2"
-                    onClick={() => {
-                      if (videoRef.current) {
-                        const stream = videoRef.current
-                          .srcObject as MediaStream;
-                        stream?.getTracks().forEach((track) => track.stop());
-                      }
-                      setIsCameraOpen(false);
-                    }}
+                    onClick={() => setIsCameraOpen(false)}
                   >
                     Cancel
                   </Button>
@@ -208,7 +263,7 @@ export default function PlantPredictionSection() {
               <div className="w-full">
                 <div className="relative aspect-square w-full max-w-md mx-auto">
                   <img
-                    src={image || "/placeholder.svg"}
+                    src={image}
                     alt="Uploaded plant"
                     className="object-contain rounded-lg w-full h-full"
                   />
