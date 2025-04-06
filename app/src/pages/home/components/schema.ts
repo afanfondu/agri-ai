@@ -64,12 +64,12 @@ export const fertilizerFormSchema = object({
   potassium: number()
     .required("Potassium is required")
     .transform((value) => (isNaN(value) ? undefined : value))
-    .min(5, "Potassium must be at least 5")
+    .min(0, "Potassium must be at least 0")
     .max(205, "Potassium must be at most 205"),
   phosphorous: number()
     .required("Phosphorous is required")
     .transform((value) => (isNaN(value) ? undefined : value))
-    .min(5, "Phosphorous must be at least 5")
+    .min(0, "Phosphorous must be at least 0")
     .max(145, "Phosphorous must be at most 145"),
   soilType: string().required("Please select a soil type"),
   cropType: string().required("Please select a crop type"),

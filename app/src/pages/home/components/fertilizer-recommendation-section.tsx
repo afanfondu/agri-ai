@@ -202,7 +202,7 @@ export default function FertilizerRecommendationSection() {
                       <FormItem>
                         <FormLabel>Potassium (K) mg/kg</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="5-205" {...field} />
+                          <Input type="number" placeholder="0-205" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -216,7 +216,7 @@ export default function FertilizerRecommendationSection() {
                       <FormItem>
                         <FormLabel>Phosphorous (P) mg/kg</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="5-145" {...field} />
+                          <Input type="number" placeholder="0-145" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
